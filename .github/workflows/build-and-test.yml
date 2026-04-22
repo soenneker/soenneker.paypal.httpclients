@@ -38,7 +38,7 @@ jobs:
         run: dotnet build test/Soenneker.PayPal.HttpClients.Tests/Soenneker.PayPal.HttpClients.Tests.csproj --configuration Release --no-restore --verbosity minimal
 
       - name: Test
-        run: dotnet test test/Soenneker.PayPal.HttpClients.Tests/Soenneker.PayPal.HttpClients.Tests.csproj --configuration Release --no-build --no-restore --verbosity minimal
+        run: dotnet test --project test/Soenneker.PayPal.HttpClients.Tests/Soenneker.PayPal.HttpClients.Tests.csproj --configuration Release --no-build --no-restore --verbosity minimal
 
       - name: Pack
         run: dotnet pack src/Soenneker.PayPal.HttpClients/Soenneker.PayPal.HttpClients.csproj --configuration Release --no-build --no-restore --output . --verbosity minimal

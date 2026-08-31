@@ -11,11 +11,11 @@ using Soenneker.Utils.HttpClientCache.Abstract;
 
 namespace Soenneker.PayPal.HttpClients;
 
-///<inheritdoc cref="IPayPalOpenApiHttpClient"/>
 public sealed class PayPalOpenApiHttpClient : IPayPalOpenApiHttpClient
 {
     private readonly IHttpClientCache _httpClientCache;
     private readonly IConfiguration _config;
+    private readonly string _clientId = $"{nameof(PayPalOpenApiHttpClient)}:{Guid.NewGuid():N}";
 
     private const string _prodBaseUrl = "https://api-m.paypal.com";
 
@@ -27,12 +27,12 @@ public sealed class PayPalOpenApiHttpClient : IPayPalOpenApiHttpClient
 
     public ValueTask<HttpClient> Get(CancellationToken cancellationToken = default)
     {
-        return _httpClientCache.Get(nameof(PayPalOpenApiHttpClient), (config: _config, baseUrl: _config["PayPal:ClientBaseUrl"] ?? _prodBaseUrl), static state =>
+        return _httpClientCache.Get(_clientId, (config: _config, baseUrl: _config["PayPal:ClientBaseUrl"] ?? _prodBaseUrl), static state =>
         {
-            var apiKey = state.config.GetValueStrict<string>("PayPal:ApiKey");
+            string accessToken = state.config["PayPal:AccessToken"] ?? state.config.GetValueStrict<string>("PayPal:ApiKey");
             string authHeaderName = state.config["PayPal:AuthHeaderName"] ?? "Authorization";
             string authHeaderValueTemplate = state.config["PayPal:AuthHeaderValueTemplate"] ?? "Bearer {token}";
-            string authHeaderValue = authHeaderValueTemplate.Replace("{token}", apiKey, StringComparison.Ordinal);
+            string authHeaderValue = authHeaderValueTemplate.Replace("{token}", accessToken, StringComparison.Ordinal);
 
             return new HttpClientOptions
             {
@@ -45,20 +45,13 @@ public sealed class PayPalOpenApiHttpClient : IPayPalOpenApiHttpClient
         }, cancellationToken);
     }
 
-    /// <summary>
-    /// Releases resources used by the current instance.
-    /// </summary>
     public void Dispose()
     {
-        _httpClientCache.RemoveSync(nameof(PayPalOpenApiHttpClient));
+        _httpClientCache.RemoveSync(_clientId);
     }
 
-    /// <summary>
-    /// Asynchronously releases resources used by the current instance.
-    /// </summary>
-    /// <returns>A task that represents the asynchronous operation.</returns>
     public ValueTask DisposeAsync()
     {
-        return _httpClientCache.Remove(nameof(PayPalOpenApiHttpClient));
+        return _httpClientCache.Remove(_clientId);
     }
 }

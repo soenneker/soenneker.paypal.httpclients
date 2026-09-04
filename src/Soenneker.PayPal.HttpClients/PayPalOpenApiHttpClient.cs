@@ -11,6 +11,7 @@ using Soenneker.Utils.HttpClientCache.Abstract;
 
 namespace Soenneker.PayPal.HttpClients;
 
+/// <inheritdoc cref="IPayPalOpenApiHttpClient" />
 public sealed class PayPalOpenApiHttpClient : IPayPalOpenApiHttpClient
 {
     private readonly IHttpClientCache _httpClientCache;

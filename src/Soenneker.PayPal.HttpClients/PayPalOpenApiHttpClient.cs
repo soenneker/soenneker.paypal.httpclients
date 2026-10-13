@@ -30,7 +30,7 @@ public sealed class PayPalOpenApiHttpClient : IPayPalOpenApiHttpClient
     {
         return _httpClientCache.Get(_clientId, (config: _config, baseUrl: _config["PayPal:ClientBaseUrl"] ?? _prodBaseUrl), static state =>
         {
-            string accessToken = state.config["PayPal:AccessToken"] ?? state.config.GetValueStrict<string>("PayPal:ApiKey");
+            string accessToken = state.config["PayPal:AccessToken"] ?? state.config.GetStringStrict("PayPal:ApiKey");
             string authHeaderName = state.config["PayPal:AuthHeaderName"] ?? "Authorization";
             string authHeaderValueTemplate = state.config["PayPal:AuthHeaderValueTemplate"] ?? "Bearer {token}";
             string authHeaderValue = authHeaderValueTemplate.Replace("{token}", accessToken, StringComparison.Ordinal);
